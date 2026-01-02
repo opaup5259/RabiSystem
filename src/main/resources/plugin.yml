@@ -1,0 +1,13 @@
+name: RabiSystem
+version: '1.0'
+main: cn.rabitown.rabisystem.RabiSystem
+api-version: '1.21'
+authors: [ opaup ]
+softdepend: [ RabiWhitelist, LibsDisguises, ProtocolLib ]
+
+commands:
+  rabi:
+    description: RabiSystem 核心指令
+    usage: /rabi
+    aliases: [rs, rabisystem]
+    permission: rabisystem.admin
