@@ -11,6 +11,7 @@ import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class WhitelistAdminCommand implements ISubCommand {
@@ -40,7 +41,12 @@ public class WhitelistAdminCommand implements ISubCommand {
         }
 
         if (sub.equals("list")) {
-            sender.sendMessage(Component.text("§e白名单玩家: §f" + module.getManager().getWhitelistCache().toString()));
+            Set<String> list = module.getManager().getWhitelistCache();
+            int size = list.size();
+            // [美化] 列表输出
+            sender.sendMessage(mm.deserialize("<newline>   <gradient:#ffaa00:#ffff55><b>[白名单列表]</b></gradient> <gray>(共 " + size + " 人)"));
+            sender.sendMessage(mm.deserialize("   <dark_gray>▪ <white>" + String.join("<gray>, <white>", list)));
+            sender.sendMessage(mm.deserialize(""));
             return;
         }
 

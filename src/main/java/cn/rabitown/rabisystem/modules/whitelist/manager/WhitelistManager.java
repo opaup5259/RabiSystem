@@ -1,6 +1,7 @@
 package cn.rabitown.rabisystem.modules.whitelist.manager;
 
 import cn.rabitown.rabisystem.modules.whitelist.WhitelistModule;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -67,13 +68,20 @@ public class WhitelistManager {
 
         player.sendMessage(mm.deserialize(getString("whitelist.messages.accept-success")));
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f); // 增加成就音效，更喜庆
 
-        // 执行控制台指令
+        // [优化] 不再使用 on-accept-commands (预留代码，暂不执行)
         List<String> commands = module.getPlugin().getConfig().getStringList("whitelist.on-accept-commands");
         for (String cmd : commands) {
             String finalCmd = cmd.replace("{player}", player.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCmd);
         }
+
+        // [新增] 直接广播美化后的欢迎消息
+        Component welcomeMsg = mm.deserialize(
+                "<newline>   <gradient:#ff5555:#ffaa00><b>[RabiWL]</b></gradient> <gray>✦ 欢迎新伙伴 <aqua>" + player.getName() + "</aqua> 正式加入小兔社区！ ✦   <newline>"
+        );
+        Bukkit.broadcast(welcomeMsg);
     }
 
     public void performDeny(Player player) {

@@ -20,23 +20,23 @@ whitelist:
   # {player} 会被替换为玩家名
   on-accept-commands:
     #  - "lp user {player} parent set default"
-    - "say 欢迎玩家 {player} 正式加入小兔社区喵！"
+#    - "say 欢迎玩家 {player} 正式加入小兔社区喵！"
 
   # 拒绝规则后的动作
   on-deny-action: "MESSAGE" # 可选: KICK (踢出), MESSAGE (仅发送消息)
 
   messages:
-    prefix: "<gradient:#ff5555:#ffaa00>[RabiWL]</gradient> "
-    no-permission: "<red>你没有权限执行此命令。"
-    chat-blocked: "<red>在同意规则前，禁止发送聊天消息！"
-    command-blocked: "<red>在同意规则前，你只能使用 /wl 相关指令！"
+    prefix: "<gradient:#ff5555:#ffaa00><b>[拉比小镇]</b></gradient> "
+    no-permission: "<red>⚠ <gray>你没有权限执行此命令。"
+    chat-blocked: "<red>⛔ <gray>在同意规则前，禁止发送聊天消息！"
+    command-blocked: "<red>⛔ <gray>在同意规则前，你只能使用 <yellow>wl和登录</yellow> 相关指令！"
 
-    # 管理员命令反馈
-    player-added: "<green>已将玩家 <white>{player}</white> 添加到白名单。"
-    player-removed: "<red>已将玩家 <white>{player}</white> 从白名单移除。"
-    player-exists: "<yellow>该玩家已在白名单中。"
-    player-not-found: "<yellow>该玩家不在白名单中。"
-    reload: "<green>配置与数据已重载。"
+    # 管理员命令反馈 (已美化)
+    player-added: "<green>✔ <gray>已将玩家 <aqua>{player}</aqua> 添加到白名单。"
+    player-removed: "<red>✘ <gray>已将玩家 <aqua>{player}</aqua> 从白名单移除。"
+    player-exists: "<yellow>⚠ <gray>该玩家已在白名单中。"
+    player-not-found: "<yellow>⚠ <gray>该玩家不在白名单中。"
+    reload: "<green>✔ <gray>配置与数据已重载。"
 
     # 访客（未在白名单）提示
     visitor-join:
@@ -61,11 +61,12 @@ whitelist:
       - "<gray>或者在聊天栏输入 <white>'同意'</white> 或 <white>'拒绝'</white>"
       - "<gray>========================================="
       - "服务器交流群：497097164，如有疑问，请联系服主或管理员"
+      - "<gray>========================================="
 
     # 状态反馈
-    already-accepted: "<green>你已经同意过规则了，无需再次同意。"
-    accept-success: "<green>你已同意服务器规则，权限已解锁！"
-    deny-message: "<red>你拒绝了服务器规则。"
+    already-accepted: "<green>✔ <gray>你已经同意过规则了，无需再次同意。"
+    accept-success: "<green>✔ <gray>你已同意服务器规则，权限已解锁！"
+    deny-message: "<red>✘ <gray>你拒绝了服务器规则。"
     deny-kick: "<red>你需要同意服务器规则才能进行游戏。"
     visitor-actionbar: "<red>⚠ 你不在白名单中，无法进行此操作！"
     action-blocked: "<red>⚠ 请先同意规则 (/wl accept)"

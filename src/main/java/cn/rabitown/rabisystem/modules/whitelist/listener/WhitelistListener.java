@@ -43,8 +43,7 @@ public class WhitelistListener implements Listener {
 
         if (module.getManager().isVisitor(player)) {
             // 场景 1: 访客 (不在白名单) -> 发送提示
-//            List<String> msgList = config.getStringList("whitelist.messages.visitor-join");
-            List<String> msgList = config.getStringList("whitelist.messages.pending-rules");
+            List<String> msgList = config.getStringList("whitelist.messages.visitor-join");
             for (String line : msgList) {
                 player.sendMessage(mm.deserialize(prefix + line));
             }
@@ -141,7 +140,8 @@ public class WhitelistListener implements Listener {
     }
 
     // --- 🚫 物理交互拦截 ---
-    @EventHandler
+    // [修改] 提高优先级到 LOWEST (最先执行)，确保在其他插件拦截前发送提示
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBreak(BlockBreakEvent event) {
         if (module.getManager().isRestricted(event.getPlayer())) {
             sendBlockMessage(event.getPlayer());
