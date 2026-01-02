@@ -12,6 +12,65 @@ modules:
     enabled: true
 
 # ==========================================
+#        Whitelist (白名单) 模块配置
+# ==========================================
+whitelist:
+  enabled: true
+  # 玩家同意规则后，控制台执行的指令
+  # {player} 会被替换为玩家名
+  on-accept-commands:
+    #  - "lp user {player} parent set default"
+    - "say 欢迎玩家 {player} 正式加入小兔社区喵！"
+
+  # 拒绝规则后的动作
+  on-deny-action: "MESSAGE" # 可选: KICK (踢出), MESSAGE (仅发送消息)
+
+  messages:
+    prefix: "<gradient:#ff5555:#ffaa00>[RabiWL]</gradient> "
+    no-permission: "<red>你没有权限执行此命令。"
+    chat-blocked: "<red>在同意规则前，禁止发送聊天消息！"
+    command-blocked: "<red>在同意规则前，你只能使用 /wl 相关指令！"
+
+    # 管理员命令反馈
+    player-added: "<green>已将玩家 <white>{player}</white> 添加到白名单。"
+    player-removed: "<red>已将玩家 <white>{player}</white> 从白名单移除。"
+    player-exists: "<yellow>该玩家已在白名单中。"
+    player-not-found: "<yellow>该玩家不在白名单中。"
+    reload: "<green>配置与数据已重载。"
+
+    # 访客（未在白名单）提示
+    visitor-join:
+      - "<gray>========================================="
+      - "<red><b> 注意：你当前处于访客模式</b>"
+      - "<gray>你尚未被列入服务器白名单。"
+      - "<gray>你可以参观，但无法进行任何交互。"
+      - "<gray>请加群497097164联系管理员申请白名单权限。"
+      - "<gray>========================================="
+
+    # 待同意规则（已在白名单，但未同意）提示
+    pending-rules:
+      - "<gray>========================================="
+      - "<yellow><b> 服务器规则说明</b>"
+      - "<gray>1. 本服基本无规则，但不可影响其他玩家游戏体验，拿物品需要经过他人同意，不可进行恶意建造卡服、破坏地形的装置与行为，不可恶意破坏他人建筑，如无意破坏请尽快恢复以及道歉"
+      - "<gray>2. 不可发布令他人不适的内容，包括但不限于：地域歧视、种族歧视、键政、辱骂、嘲讽、压力等"
+      - "<gray>3. 禁止作弊程序、恶意利用Bug等一切破坏游戏体验的不文明行为，如出现以上行为导致影响其他玩家游戏体验请及时道歉"
+      - ""
+      - "<gray>获得本服白名单进入本服进行游玩，即同意以上规则，规则解释权归服主与管理员所有，违反规则的玩家，服主与管理有权对玩家进行适当处理</gray>"
+      - "<gray>请选择是否接受以上规则："
+      - "<click:run_command:'/wl accept'><hover:show_text:'<green>点击同意'><green>[同意规则 (Accept)]</green></hover></click>   <click:run_command:'/wl deny'><hover:show_text:'<red>点击拒绝'><red>[拒绝 (Deny)]</red></hover></click>"
+      - "<gray>或者在聊天栏输入 <white>'同意'</white> 或 <white>'拒绝'</white>"
+      - "<gray>========================================="
+      - "服务器交流群：497097164，如有疑问，请联系服主或管理员"
+
+    # 状态反馈
+    already-accepted: "<green>你已经同意过规则了，无需再次同意。"
+    accept-success: "<green>你已同意服务器规则，权限已解锁！"
+    deny-message: "<red>你拒绝了服务器规则。"
+    deny-kick: "<red>你需要同意服务器规则才能进行游戏。"
+    visitor-actionbar: "<red>⚠ 你不在白名单中，无法进行此操作！"
+    action-blocked: "<red>⚠ 请先同意规则 (/wl accept)"
+
+# ==========================================
 #        Corpse (跑尸) 模块配置
 # ==========================================
 corpse:

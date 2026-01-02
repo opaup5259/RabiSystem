@@ -4,7 +4,12 @@ package cn.rabitown.rabisystem.core.manager;
 import cn.rabitown.rabisystem.RabiSystem;
 import cn.rabitown.rabisystem.api.IRabiModule;
 import cn.rabitown.rabisystem.modules.corpse.CorpseModule;
+import cn.rabitown.rabisystem.modules.playtime.PlayTimeModule;
+import cn.rabitown.rabisystem.modules.prefix.PrefixModule;
 import cn.rabitown.rabisystem.modules.spirit.SpiritModule;
+import cn.rabitown.rabisystem.modules.warpStone.WarpStoneModule;
+import cn.rabitown.rabisystem.modules.warpStone.data.WarpStone;
+import cn.rabitown.rabisystem.modules.whitelist.WhitelistModule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +22,12 @@ public class ModuleManager {
 
     public ModuleManager() {
         // 在这里注册所有可用的模块实例
-        registerModule(new SpiritModule());
-        registerModule(new CorpseModule());
+        registerModule(new WhitelistModule()); // ✅ 注册白名单模块
+        registerModule(new PrefixModule()); // ✅ 注册玩家前缀控制模块
+        registerModule(new SpiritModule()); // ✅ 注册小精灵模块
+        registerModule(new CorpseModule()); // ✅ 注册跑尸模块
+        registerModule(new WarpStoneModule()); // ✅ 注册传送石模块
+        registerModule(new PlayTimeModule()); // ✅ 注册游戏时间统计模块
     }
 
     private void registerModule(IRabiModule module) {
