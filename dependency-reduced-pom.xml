@@ -87,6 +87,10 @@
       <id>codemc-releases</id>
       <url>https://repo.codemc.io/repository/maven-releases/</url>
     </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -111,6 +115,12 @@
       <groupId>com.github.retrooper</groupId>
       <artifactId>packetevents-spigot</artifactId>
       <version>2.4.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.NEZNAMY</groupId>
+      <artifactId>TAB-API</artifactId>
+      <version>5.4.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

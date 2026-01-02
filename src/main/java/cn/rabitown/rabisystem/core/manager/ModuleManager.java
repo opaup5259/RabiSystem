@@ -3,6 +3,7 @@ package cn.rabitown.rabisystem.core.manager;
 
 import cn.rabitown.rabisystem.RabiSystem;
 import cn.rabitown.rabisystem.api.IRabiModule;
+import cn.rabitown.rabisystem.modules.corpse.CorpseModule;
 import cn.rabitown.rabisystem.modules.spirit.SpiritModule;
 
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public class ModuleManager {
     public ModuleManager() {
         // 在这里注册所有可用的模块实例
         registerModule(new SpiritModule());
+        registerModule(new CorpseModule());
     }
 
     private void registerModule(IRabiModule module) {

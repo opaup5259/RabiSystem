@@ -7,3 +7,117 @@ modules:
   # 灵契模块 (Spirit Module)
   spirit:
     enabled: true
+  # 跑尸模块 (Corpse Module)
+  corpse:
+    enabled: true
+
+# ==========================================
+#        Corpse (跑尸) 模块配置
+# ==========================================
+corpse:
+  # 创造模式豁免
+  # 如果为 true，创造模式玩家死亡时将保持原版行为（不生成尸体、不变成幽灵、遵循原版掉落规则）
+  creative-bypass: true
+
+  # 尸体保护时间（分钟）
+  protection-minutes: 60
+
+  # 传送至尸体附近的随机半径 (格)
+  tp-radius: 500
+
+  # 幽灵视觉效果设置
+  ghost-visuals:
+    # 是否启用夜视 (让原本黑暗的地方可见)
+    night-vision: true
+    # 是否启用冰冻效果 (屏幕边缘结冰，营造寒冷感)
+    freezing-overlay: true
+    # 是否强制阴雨天 (让天空变灰，营造压抑感)
+    gloomy-weather: true
+
+  # 复活后的状态设置
+  revive-stats:
+    # 找回尸体 或 出生点复活 (强力状态)
+    corpse-retrieval:
+      health: 10.0
+      food: 8
+    # 床复活 (虚弱状态)
+    bed-revive:
+      health: 6.0
+      food: 6
+
+  # 视觉特效配置
+  visuals:
+    # 是否启用传送时的 GTA 风格运镜动画
+    # 注意: 如果服务器网络延迟较高，建议关闭，否则可能会卡顿
+    enable-gta-teleport: true
+
+    # GTA 动画拉升高度 (格)
+    gta-height: 100
+
+    # 复活时的特效
+    # true = 开启, false = 关闭
+    enable-revive-distortion: true  # 尸体复活时的扭曲 (反胃效果)
+    enable-bed-wakeup: true         # 床复活时的起床模拟 (黑屏+视角抬起)
+
+  sounds:
+    # 幽灵状态下的背景音乐 (循环风声)
+    ghost-bgm: "MUSIC_DISC_FAR" #"AMBIENT_SOUL_SAND_VALLEY_LOOP"
+    ghost-bgm-volume: 1.0
+    ghost-bgm-pitch: 1.0
+
+    # 幽灵心跳声 (每秒播放一次)
+    ghost-heartbeat: "ENTITY_WARDEN_HEARTBEAT"
+    ghost-heartbeat-volume: 1.0
+    ghost-heartbeat-pitch: 1.0
+
+    # 复活时的音效
+    revive: "BLOCK_BEACON_ACTIVATE"
+    revive-volume: 1.0
+    revive-pitch: 1.0
+
+    # 捡尸体音效
+    corpse-pickup: "ITEM_BUNDLE_DROP_CONTENTS"
+    corpse-pickup-volume: 1.0
+    corpse-pickup-pitch: 1.0
+
+  # 幽灵前缀 (支持 MiniMessage 格式)
+  # 显示在 Tab 列表和聊天栏中
+  ghost-prefix: "<gray>[<red>👻<gray>] "
+
+  messages:
+    prefix: "<gray>[<gradient:red:gold>WowCorpse</gradient>] <reset>"
+    death-title: "<red>你已死亡，灵魂出窍..."
+    death-subtitle: "<yellow>尸体坐标: <x>, <y>, <z>"
+
+    # 特殊死亡时的豁免提示
+    special-death-bypass: "<green>检测到特殊死亡环境（岩浆/虚空），物品已保留，但你将虚弱复活。"
+
+    soul-status:
+      header: "<gray>--------------------------------"
+      line1: "<gold>你已进入灵魂状态！"
+      line2: "<yellow>寻找你的尸体 (坐标: <x>, <y>, <z>)"
+      # 新增传送按钮
+      line2-tp: " <green><click:run_command:/rs corpse tpnear>[点击传送至附近]</click>"
+      line3-bed: "<aqua>在床边虚弱复活 (右键床)"
+      line3-nobed: "<red>未检测到床！ <green><click:run_command:/rs corpse spawnrevive>[点击此处在世界出生点复活]</click>"
+      footer: "<gray>--------------------------------"
+
+    # Actionbar 导航提示
+    # <distance> = 距离米数, <arrow> = 动态方向箭头
+    ghost-actionbar: "<yellow>[<arrow>] <gold>尸体距离: <green><distance>米 <yellow>[<arrow>]"
+    # 清理指令提示
+    purge-success: "<green>已清理加载区块内的 <count> 个尸体全息悬浮字。"
+
+    # 复活后的额外提示
+    revive-reminder: "<gray>物品仍在尸体处。使用 <yellow>/rs corpse info <gray>再次查询坐标。"
+
+    # 新增传送提示
+    tp-success: "<green>已传送至尸体附近区域。"
+    tp-fail: "<red>传送失败，无法找到安全落脚点。"
+
+    spawn-revive: "<green>你在世界出生点重获新生！"
+    corpse-found: "<green>你找回了遗物！"
+    inventory-full: "<red>背包空间不足，无法找回！"
+    not-owner: "<red>这不是你的尸体，且处于保护期内！剩余: <time>"
+    protection-expired: "<green>保护期已过，正在拾取..."
+    admin-break: "<red>管理员强制破坏了尸体，物品已掉落。"
