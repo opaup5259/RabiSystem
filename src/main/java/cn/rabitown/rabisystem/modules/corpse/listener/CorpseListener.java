@@ -57,8 +57,9 @@ public class CorpseListener implements Listener {
             // [Config] 路径更新
             player.sendMessage(mm.deserialize(module.getConfigManager().getConfig().getString("corpse.messages.prefix") + module.getConfigManager().getConfig().getString("corpse.messages.special-death-bypass")));
             new BukkitRunnable() {
+                // [Fix] 增加到 5 tick 延迟，防止客户端未处理完死亡包就强制复活导致卡死
                 @Override public void run() { if (player.isOnline() && player.isDead()) player.spigot().respawn(); }
-            }.runTaskLater(module.getPlugin(), 1L);
+            }.runTaskLater(module.getPlugin(), 5L);
             return;
         }
 
@@ -106,8 +107,9 @@ public class CorpseListener implements Listener {
 
         manager.getGhosts().add(player.getUniqueId());
         new BukkitRunnable() {
+            // [Fix] 增加到 5 tick 延迟，防止客户端未处理完死亡包就强制复活导致卡死
             @Override public void run() { if (player.isOnline() && player.isDead()) player.spigot().respawn(); }
-        }.runTaskLater(module.getPlugin(), 1L);
+        }.runTaskLater(module.getPlugin(), 5L);
     }
 
     @EventHandler
