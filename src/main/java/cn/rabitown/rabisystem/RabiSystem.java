@@ -1,6 +1,9 @@
+// File: src/main/java/cn/rabitown/rabisystem/RabiSystem.java
 package cn.rabitown.rabisystem;
 
 import cn.rabitown.rabisystem.core.command.CommandManager;
+import cn.rabitown.rabisystem.core.command.ModuleCommand;
+import cn.rabitown.rabisystem.core.manager.ModuleManager;
 import cn.rabitown.rabisystem.modules.spirit.SpiritModule;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -8,9 +11,7 @@ public class RabiSystem extends JavaPlugin {
 
     private static RabiSystem instance;
     private static CommandManager commandManager;
-
-    // 这里可以放一个 List<IRabiModule> 来管理所有模块
-    private SpiritModule spiritModule;
+    private static ModuleManager moduleManager;
 
     public static RabiSystem getInstance() {
         return instance;
@@ -18,6 +19,10 @@ public class RabiSystem extends JavaPlugin {
 
     public static CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public static ModuleManager getModuleManager() {
+        return moduleManager;
     }
 
     @Override
@@ -34,28 +39,31 @@ public class RabiSystem extends JavaPlugin {
             getCommand("rabi").setTabCompleter(commandManager);
         }
 
-        // 3. 加载灵契模块 (Spirit)
-        // 注意：这里手动加载，未来可以写一个 ModuleManager 自动扫描
-        if (getConfig().getBoolean("modules.spirit.enabled", true)) {
-            spiritModule = new SpiritModule();
-            spiritModule.onEnable();
-        }
+        // 注册核心管理指令 (/rs module)
+        commandManager.registerSubCommand("module", new ModuleCommand());
 
-        getLogger().info("RabiSystem 核心已启动！");
+        // 3. 初始化模块管理器并加载模块
+        moduleManager = new ModuleManager();
+        moduleManager.loadAllModules();
+
+        getLogger().info("RabiSystem 核心已启动！(paper 1.21.11)");
     }
 
     @Override
     public void onDisable() {
-        // 卸载模块
-        if (spiritModule != null) {
-            spiritModule.onDisable();
+        // 卸载所有模块
+        if (moduleManager != null) {
+            moduleManager.disableAllModules();
         }
 
-        // 保存数据逻辑可以放在各模块的 onDisable 中
+        getLogger().info("RabiSystem 核心已关闭！");
     }
 
-    // 提供给模块获取 SpiritModule 的方法 (如果需要跨模块调用)
+    // 快捷获取 SpiritModule 的方法（为了兼容旧代码 SpiritUtils）
     public SpiritModule getSpiritModule() {
-        return spiritModule;
+        if (moduleManager != null) {
+            return (SpiritModule) moduleManager.getModule("spirit");
+        }
+        return null;
     }
 }
