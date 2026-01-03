@@ -3,6 +3,7 @@ package cn.rabitown.rabisystem.modules.playtime;
 import cn.rabitown.rabisystem.modules.spirit.ui.SpiritMenus;
 import cn.rabitown.rabisystem.modules.spirit.utils.SpiritUtils;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,6 +41,7 @@ public class PlayTimeListener implements Listener {
         // Slot 4: 如果是铁门，则是返回按钮
         if (event.getSlot() == 4 && event.getCurrentItem().getType() == Material.IRON_DOOR) {
             // 返回小精灵 P2 (因为入口在 P2)
+            player.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1f);
             SpiritMenus.openMainMenu(player, SpiritUtils.getSpiritManager().getProfile(player.getUniqueId()), 2);
             return;
         }

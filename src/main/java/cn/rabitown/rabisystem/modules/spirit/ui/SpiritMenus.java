@@ -70,6 +70,7 @@ public class SpiritMenus {
         int level = profile.getLevel();
 
         // 统一背景板
+        ItemStack air = createSpacer(Material.AIR);
         ItemStack whiteGlass = createSpacer(Material.WHITE_STAINED_GLASS_PANE);
         ItemStack blackGlass = createSpacer(Material.BLACK_STAINED_GLASS_PANE);
 
@@ -150,8 +151,8 @@ public class SpiritMenus {
                 inv.setItem(14, locked);
             }
 
-            inv.setItem(15, whiteGlass); // 空白
-            inv.setItem(16, whiteGlass); // 空白
+            inv.setItem(16, air); // 空白
+            inv.setItem(16, air); // 空白
 
             // 成就铭刻 (动态计算)
             int totalAchs = Achievement.values().length;
@@ -310,7 +311,7 @@ public class SpiritMenus {
             inv.setItem(17, createVoidGravityIcon(profile)); // 虚空引力
 
             // --- Row 2 ---
-            fillRow(inv, 18, Material.BLACK_STAINED_GLASS_PANE);
+            fillRow(inv, 18, Material.AIR);
 
             // --- Row 3 ---
             fillRow(inv, 27, Material.BLACK_STAINED_GLASS_PANE);
@@ -336,11 +337,11 @@ public class SpiritMenus {
                     "§e▶ 点击查看"
             ));
 
-            inv.setItem(38, whiteGlass);
-            inv.setItem(39, whiteGlass);
-            inv.setItem(40, whiteGlass);
-            inv.setItem(41, whiteGlass);
-            inv.setItem(42, whiteGlass);
+            inv.setItem(38, air);
+            inv.setItem(39, air);
+            inv.setItem(40, air);
+            inv.setItem(41, air);
+            inv.setItem(42, air);
 
             // 认知干扰
             boolean hideState = profile.isHideOthers();
@@ -389,10 +390,10 @@ public class SpiritMenus {
             inv.setItem(45, blackGlass);
             inv.setItem(46, blackGlass);
             inv.setItem(47, blackGlass);
-            inv.setItem(48, whiteGlass);
-            inv.setItem(49, whiteGlass);
-            inv.setItem(50, whiteGlass);
-            inv.setItem(51, whiteGlass);
+            inv.setItem(48, blackGlass);
+            inv.setItem(49, blackGlass);
+            inv.setItem(50, blackGlass);
+            inv.setItem(51, blackGlass);
             inv.setItem(52, createItem(Material.ARROW, "§f◀ 上一页", "§7返回主页"));
             inv.setItem(53, blackGlass);
         }
@@ -443,14 +444,44 @@ public class SpiritMenus {
                 continue;
             }
 
-            // B. 已解锁区域
+            // [新增] B. 倒数第二格 (Slot 7): 自动进食开关
+            if (i == 7) {
+                boolean autoEat = profile.isAutoEat();
+                ItemStack toggle = new ItemStack(autoEat ? Material.GOLDEN_CARROT : Material.ROTTEN_FLESH);
+                ItemMeta meta = toggle.getItemMeta();
+                meta.displayName(Component.text("§6🥣 自动进食").decoration(TextDecoration.ITALIC, false));
+                meta.lore(Arrays.asList(
+                        Component.text("§7当前状态: " + (autoEat ? "§a[✔ 开启]" : "§c[✘ 关闭]")).decoration(TextDecoration.ITALIC, false),
+                        Component.text("§7开启后，小精灵在饥饿/掉血时"),
+                        Component.text("§7会自动消耗袋子里的食物。"),
+                        Component.text(""),
+                        Component.text("§e▶ 点击切换").decoration(TextDecoration.ITALIC, false)
+                ));
+                // 打上按钮标签，防止被拿走
+                markAsButton(toggle);
+                if (autoEat) {
+                    meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                }
+                toggle.setItemMeta(meta);
+                inv.setItem(i, toggle);
+                continue;
+            }
+
+            // C. 5-6格：装饰占位 (使用 AIR 或 玻璃板，这里用玻璃板保持统一，或者留空)
+            if (i == 5 || i == 6) {
+                inv.setItem(i, createSpacer(Material.WHITE_STAINED_GLASS_PANE));
+                continue;
+            }
+
+            // D. 已解锁食物区域 (0-4)
             if (i < unlockedSlots) {
                 if (stored != null && i < stored.length && stored[i] != null) {
                     inv.setItem(i, stored[i]);
                 }
             }
-            // C. 未解锁区域：填充白色玻璃板
-            else {
+            // E. 未解锁区域
+            else if (i < 5) { // 限制范围，不要覆盖了后面的按钮
                 ItemStack glass = new ItemStack(Material.WHITE_STAINED_GLASS_PANE);
                 ItemMeta meta = glass.getItemMeta();
                 meta.displayName(Component.text("§7[未解锁槽位] Lv." + getNextUnlockLevel(i)).decoration(TextDecoration.ITALIC, false));
@@ -523,6 +554,9 @@ public class SpiritMenus {
 
     private static ItemStack createSpacer(Material mat) {
         ItemStack item = new ItemStack(mat);
+        if (mat == Material.AIR || mat.isAir()) {
+            return item;
+        }
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.empty());
         item.setItemMeta(meta);
@@ -1732,7 +1766,7 @@ public class SpiritMenus {
     /**
      * 给物品打上“我是按钮”的标签，防止被存入背包
      */
-    private ItemStack markAsButton(ItemStack item) {
+    private static ItemStack markAsButton(ItemStack item) {
         if (item == null) return null;
         ItemMeta meta = item.getItemMeta();
         // 这里的 plugin 实例获取方式可能需要根据你的代码调整，或者直接传参
@@ -2131,29 +2165,28 @@ public class SpiritMenus {
     }
 
     /**
-     * [新增] 启动菜单自动刷新任务
-     * 在插件 onEnable 时调用一次即可
+     * 启动菜单自动刷新任务
+     * 1. 修正灵核图标位置 (36 -> 10)
+     * 2. 增加页码判断 (只在 Page 1 刷新)
      */
     public static void startMenuUpdater(SpiritModule module) {
         new org.bukkit.scheduler.BukkitRunnable() {
             @Override
             public void run() {
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    // 检查玩家当前打开的界面
                     Inventory topInv = p.getOpenInventory().getTopInventory();
                     if (topInv.getHolder() instanceof SpiritHolder holder) {
-                        // 只刷新主菜单 (MAIN)
-                        if ("MAIN".equals(holder.getType())) {
+                        // 只刷新主菜单 (MAIN) 且 只在第一页 (Page 1)
+                        if ("MAIN".equals(holder.getType()) && holder.getPage() == 1) {
                             SpiritProfile profile = module.getSpiritManager().getProfile(holder.getOwner());
 
-                            // 刷新 Slot 36 (灵核)
-                            // 这里调用刚刚改为 public 的 createCoreIcon
+                            // 刷新 Slot 10 (灵核)
                             ItemStack newCore = createCoreIcon(p, profile);
-                            topInv.setItem(36, newCore);
+                            topInv.setItem(10, newCore);
                         }
                     }
                 }
             }
-        }.runTaskTimer(module.getPlugin(), 20L, 20L); // 每秒刷新一次 (20 ticks)
+        }.runTaskTimer(module.getPlugin(), 20L, 20L);
     }
 }

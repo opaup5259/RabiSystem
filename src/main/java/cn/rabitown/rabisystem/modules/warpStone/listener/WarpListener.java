@@ -182,6 +182,7 @@ public class WarpListener implements Listener {
             // 传送菜单
             if (title.equals(WarpMenus.TITLE_MENU)) {
                 if (event.getSlot() == 4 && event.getCurrentItem().getType() == Material.IRON_DOOR) {
+                    player.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1f);
                     SpiritMenus.openMainMenu(player, SpiritUtils.getSpiritManager().getProfile(player.getUniqueId()), 1);
                     return;
                 }

@@ -10,6 +10,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,9 +37,20 @@ public class AFKListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
         if (event.getSlot() == 4 && event.getCurrentItem().getType() == Material.IRON_DOOR) {
+            player.playSound(player.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1f);
             SpiritMenus.openMainMenu(player, SpiritUtils.getSpiritManager().getProfile(player.getUniqueId()), 2);
         }
-        // 翻页逻辑略... (类似 PlayTime)
+        // 翻页逻辑
+        try {
+            String numStr = event.getView().getTitle().split(" ")[3];
+            int currentPage = Integer.parseInt(numStr);
+
+            if (event.getSlot() == 0 && event.getCurrentItem().getType() == Material.PAPER) {
+                module.getManager().openLeaderboard(player, currentPage - 1, true);
+            } else if (event.getSlot() == 8 && event.getCurrentItem().getType() == Material.PAPER) {
+                module.getManager().openLeaderboard(player, currentPage + 1, true);
+            }
+        } catch (Exception ignored) {}
     }
 
     @EventHandler

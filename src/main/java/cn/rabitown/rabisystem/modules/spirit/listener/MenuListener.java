@@ -148,6 +148,16 @@ public class MenuListener implements Listener {
         // --- 食物包界面 (FOOD) ---
         if ("FOOD".equals(type)) {
             if (clickedInv == e.getView().getTopInventory()) {
+                if (slot == 7) {
+                    e.setCancelled(true);
+                    boolean newState = !profile.isAutoEat();
+                    profile.setAutoEat(newState);
+                    p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+                    p.sendActionBar(newState ? "§a[自动进食] 已开启" : "§c[自动进食] 已关闭");
+                    SpiritMenus.openFoodBag(p, profile); // 刷新界面
+                    SpiritUtils.getConfigManager().saveProfile(profile);
+                    return;
+                }
                 if (slot == 8) { // 返回按钮
                     e.setCancelled(true);
                     p.playSound(p.getLocation(), Sound.BLOCK_IRON_DOOR_CLOSE, 1f, 1f);
@@ -457,6 +467,7 @@ public class MenuListener implements Listener {
                     case 43: // 认知干扰
                         profile.setHideOthers(!profile.isHideOthers());
                         p.playSound(p.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
+                        p.sendActionBar(profile.isHideOthers() ? "§a[认知干扰] 已开启 (隐藏他人小精灵)" : "§c[认知干扰] 已关闭 (显示他人小精灵)");
                         SpiritUtils.getSpiritManager().refreshVisibilityForPlayer(p);
                         SpiritMenus.openMainMenu(p, profile, 2);
                         break;
