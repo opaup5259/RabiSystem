@@ -20,7 +20,7 @@ public class AFKConfigManager {
     }
 
     private void loadData() {
-        dataFile = new File(module.getPlugin().getDataFolder(), "afk_data.yml.yml");
+        dataFile = new File(module.getPlugin().getDataFolder(), "afk_data.yml");
         if (!dataFile.exists()) {
             try {
                 dataFile.createNewFile();
@@ -39,7 +39,7 @@ public class AFKConfigManager {
         try {
             dataConfig.save(dataFile);
         } catch (IOException e) {
-            module.getPlugin().getLogger().log(Level.SEVERE, "保存 afk_data.yml.yml 失败", e);
+            module.getPlugin().getLogger().log(Level.SEVERE, "保存 afk_data.yml 失败", e);
         }
     }
 

@@ -54,7 +54,7 @@ public class FakePlayerConfigManager {
         try {
             data.save(file);
         } catch (IOException e) {
-            module.getPlugin().getLogger().log(Level.SEVERE, "保存 fakeplayer_data.yml 失败", e);
+            module.getPlugin().getLogger().log(Level.SEVERE, "保存 fakeplayer_data.yml.yml 失败", e);
         }
     }
 
