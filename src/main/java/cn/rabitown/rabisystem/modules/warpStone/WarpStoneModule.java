@@ -21,7 +21,7 @@ public class WarpStoneModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "RabiWarp (传送石)";
+        return "传送石 (RabiWarp)";
     }
 
     @Override

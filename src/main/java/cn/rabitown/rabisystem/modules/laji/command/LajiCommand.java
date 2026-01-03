@@ -18,6 +18,7 @@ import java.util.List;
 public class LajiCommand implements ISubCommand, CommandExecutor, TabCompleter {
 
     private final LajiModule module;
+    private static final String PREFIX = "§8[§b垃圾喵§8] ";
 
     public LajiCommand(LajiModule module) {
         this.module = module;
@@ -31,23 +32,31 @@ public class LajiCommand implements ISubCommand, CommandExecutor, TabCompleter {
     @Override
     public void onCommand(CommandSender sender, String[] args) {
         if (!sender.hasPermission("lajimiao.admin")) {
-            sender.sendMessage(Component.text("杂鱼没有权限指挥本喵！", NamedTextColor.RED));
+            sender.sendMessage(PREFIX + "§c杂鱼没有权限指挥本喵！");
             return;
         }
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("reload")) {
                 module.getPlugin().reloadConfig();
                 module.getManager().reloadData();
-                sender.sendMessage(Component.text("配置已重载喵！", NamedTextColor.GREEN));
+                sender.sendMessage(PREFIX + "§a配置已重载喵！");
             } else if (args[0].equalsIgnoreCase("clean")) {
                 module.getManager().performCleanUp();
-                sender.sendMessage(Component.text("正在手动执行清理...", NamedTextColor.GREEN));
+                sender.sendMessage(PREFIX + "§e正在手动执行清理...");
             } else {
-                sender.sendMessage(Component.text("用法: /lajimiao <reload|clean>", NamedTextColor.YELLOW));
+                sendHelp(sender);
             }
         } else {
-            sender.sendMessage(Component.text("用法: /lajimiao <reload|clean>", NamedTextColor.YELLOW));
+            sendHelp(sender);
         }
+    }
+
+    private void sendHelp(CommandSender sender) {
+        sender.sendMessage(" ");
+        sender.sendMessage("§8§l======== §b§l垃圾喵管理 §8§l========");
+        sender.sendMessage("§7/lajimiao reload    §f- 重载配置");
+        sender.sendMessage("§7/lajimiao clean     §f- 手动清理垃圾");
+        sender.sendMessage(" ");
     }
 
     @Override

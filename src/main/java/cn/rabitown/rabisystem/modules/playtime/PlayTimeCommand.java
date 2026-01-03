@@ -10,6 +10,7 @@ import java.util.List;
 public class PlayTimeCommand implements ISubCommand {
 
     private final PlayTimeModule module;
+    private static final String PREFIX = "§8[§a时长统计§8] ";
 
     public PlayTimeCommand(PlayTimeModule module) {
         this.module = module;
@@ -19,8 +20,9 @@ public class PlayTimeCommand implements ISubCommand {
     public void onCommand(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
             module.getManager().openLeaderboard(player, 1);
+            player.sendMessage(PREFIX + "§a已打开时长排行榜。");
         } else {
-            sender.sendMessage("§c只有玩家可以使用此指令。");
+            sender.sendMessage(PREFIX + "§c只有玩家可以使用此指令。");
         }
     }
 
@@ -31,6 +33,6 @@ public class PlayTimeCommand implements ISubCommand {
 
     @Override
     public String getPermission() {
-        return "rabisystem.use"; // 默认玩家权限
+        return "rabisystem.use";
     }
 }

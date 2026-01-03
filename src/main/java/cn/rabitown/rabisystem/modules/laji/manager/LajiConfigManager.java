@@ -87,7 +87,8 @@ public class LajiConfigManager {
 
     public void loadFilters(Set<Material> filterMaterials) {
         filterMaterials.clear();
-        List<String> filters = getMainConfig().getStringList("modules.laji.filtered-items");
+        // [修复] 路径修改为 laji.filtered-items
+        List<String> filters = getMainConfig().getStringList("laji.filtered-items");
         for (String name : filters) {
             try {
                 Material mat = Material.valueOf(name.toUpperCase());

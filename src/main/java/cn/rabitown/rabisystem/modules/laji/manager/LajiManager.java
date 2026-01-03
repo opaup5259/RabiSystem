@@ -57,7 +57,8 @@ public class LajiManager {
     // 1. 修改方法名为 startTasks 以匹配 LajiModule 中的调用
     public void startTasks() {
         if (sweepTask != null) sweepTask.cancel();
-        int cleanInterval = module.getConfigManager().getMainConfig().getInt("modules.laji.auto-clean-interval", 10);
+        // [修复] 路径修改为 laji.auto-clean-interval
+        int cleanInterval = module.getConfigManager().getMainConfig().getInt("laji.auto-clean-interval", 10);
         this.secondsRetaining = cleanInterval * 60;
 
         // 2. 修复类型不匹配：使用链式调用，将 runTaskTimer 的返回值赋值给 sweepTask
@@ -67,7 +68,8 @@ public class LajiManager {
                 secondsRetaining--;
                 // 倒计时提醒
                 if (secondsRetaining == 60 || secondsRetaining == 30 || secondsRetaining == 10 || secondsRetaining == 3) {
-                    String msg = module.getConfigManager().getMainConfig().getString("modules.laji.msg-countdown", "&7[&b垃圾喵&7] &e注意啦！地上的垃圾在 &c{time} &e秒后就要被本喵扫走了喵！");
+                    // [修复] 路径修改为 laji.msg-countdown
+                    String msg = module.getConfigManager().getMainConfig().getString("laji.msg-countdown", "&7[&b垃圾喵&7] &e注意啦！地上的垃圾在 &c{time} &e秒后就要被本喵扫走了喵！");
                     msg = msg.replace("{time}", String.valueOf(secondsRetaining));
                     broadcastLegacy(msg);
                 }
@@ -113,7 +115,8 @@ public class LajiManager {
         module.getConfigManager().saveTrashItems(trashItems);
 
         if (count > 0) {
-            String msg = module.getConfigManager().getMainConfig().getString("modules.laji.msg-cleaned", "&7[&b垃圾喵&7] &a扫除完毕！本喵一共丢掉了 &e{count} &a个垃圾，如果有不小心丢失的物品，请去公共垃圾桶自己掏喵！~");
+            // [修复] 路径修改为 laji.msg-cleaned
+            String msg = module.getConfigManager().getMainConfig().getString("laji.msg-cleaned", "&7[&b垃圾喵&7] &a扫除完毕！本喵一共丢掉了 &e{count} &a个垃圾，如果有不小心丢失的物品，请去公共垃圾桶自己掏喵！~");
             msg = msg.replace("{count}", String.valueOf(count));
             broadcastLegacy(msg);
         }

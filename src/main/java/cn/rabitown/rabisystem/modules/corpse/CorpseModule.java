@@ -21,7 +21,7 @@ public class CorpseModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "WowCorpse (跑尸模块)";
+        return "跑尸模块 (WowCorpse)";
     }
 
     @Override

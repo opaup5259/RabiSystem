@@ -19,7 +19,7 @@ public class PrefixModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "Prefix Control (前缀管理)";
+        return "前缀管理 (Prefix Control)";
     }
 
     @Override

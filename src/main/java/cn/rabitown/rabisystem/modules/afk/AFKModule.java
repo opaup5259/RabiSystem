@@ -23,7 +23,7 @@ public class AFKModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "RabiAFK (摸鱼挂机)";
+        return "摸鱼挂机 (RabiAFK)";
     }
 
     @Override

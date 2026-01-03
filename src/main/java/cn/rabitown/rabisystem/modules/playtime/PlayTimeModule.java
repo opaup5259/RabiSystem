@@ -18,7 +18,7 @@ public class PlayTimeModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "PlayTime (时长统计)";
+        return "时长统计 (PlayTime)";
     }
 
     @Override

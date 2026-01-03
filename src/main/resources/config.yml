@@ -10,6 +10,9 @@ modules:
   # 跑尸模块 (Corpse Module)
   corpse:
     enabled: true
+  # 垃圾喵模块 (Laji Module)
+  laji:
+    enabled: true
 
 # ==========================================
 #        Whitelist (白名单) 模块配置
@@ -181,3 +184,23 @@ corpse:
     not-owner: "<red>这不是你的尸体，且处于保护期内！剩余: <time>"
     protection-expired: "<green>保护期已过，正在拾取..."
     admin-break: "<red>管理员强制破坏了尸体，物品已掉落。"
+
+# ==========================================
+#        Laji (垃圾喵) 模块配置
+# ==========================================
+laji:
+  # 自动清理间隔 (分钟)
+  auto-clean-interval: 10
+
+  # 倒计时提示
+  msg-countdown: "&7[&b垃圾喵&7] &e注意啦！地上的垃圾在 &c{time} &e秒后就要被本喵扫走了喵！"
+
+  # 清理完成提示
+  msg-cleaned: "&7[&b垃圾喵&7] &a扫除完毕！本喵一共丢掉了 &e{count} &a个垃圾，如果有不小心丢失的物品，请去公共垃圾桶自己掏喵！~"
+
+  # 过滤物品列表 (不会被清理的物品材质)
+  filtered-items:
+    - "DIAMOND"
+    - "NETHERITE_INGOT"
+    - "NETHER_STAR"
+    - "DRAGON_EGG"

@@ -23,7 +23,7 @@ public class LajiModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "LajiMiao (垃圾喵)";
+        return "垃圾喵 (LajiMiao)";
     }
 
     @Override

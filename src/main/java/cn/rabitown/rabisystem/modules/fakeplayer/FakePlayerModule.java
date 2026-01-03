@@ -23,7 +23,7 @@ public class FakePlayerModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "RabiFakePlayer (假人系统)";
+        return "假人系统 (RabiFakePlayer)";
     }
 
     @Override

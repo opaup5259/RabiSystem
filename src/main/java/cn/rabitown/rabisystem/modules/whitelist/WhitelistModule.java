@@ -1,3 +1,4 @@
+// File: src/main/java/cn/rabitown/rabisystem/modules/whitelist/WhitelistModule.java
 package cn.rabitown.rabisystem.modules.whitelist;
 
 import cn.rabitown.rabisystem.RabiSystem;
@@ -24,7 +25,7 @@ public class WhitelistModule implements IRabiModule {
 
     @Override
     public String getDisplayName() {
-        return "RabiWhitelist (白名单)";
+        return "白名单 (RabiWhitelist)";
     }
 
     @Override
@@ -36,13 +37,16 @@ public class WhitelistModule implements IRabiModule {
         // 注册事件
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 
-        // 注册管理指令 /rabi whitelist
-        RabiSystem.getCommandManager().registerSubCommand("whitelist", new WhitelistAdminCommand(this));
+        // 创建管理员指令实例
+        WhitelistAdminCommand adminCmd = new WhitelistAdminCommand(this);
 
-        // 注册玩家指令 /wl 和 /whitelist (需要在 plugin.yml 中定义)
-        WhitelistPlayerCommand playerCmd = new WhitelistPlayerCommand(this);
+        // 注册管理指令 /rabi whitelist (作为子命令)
+        RabiSystem.getCommandManager().registerSubCommand("whitelist", adminCmd);
+
+        // 注册玩家独立指令 /wl 和 /whitelist (传入 adminCmd 以支持管理员快捷操作)
+        WhitelistPlayerCommand playerCmd = new WhitelistPlayerCommand(this, adminCmd);
         registerStandaloneCommand("wl", playerCmd);
-        registerStandaloneCommand("whitelist_player", playerCmd); // 避免冲突，plugin.yml 里可以叫 whitelist
+        registerStandaloneCommand("whitelist", playerCmd);
 
         plugin.getLogger().info("⚡ [" + getDisplayName() + "] 模块已加载");
     }
