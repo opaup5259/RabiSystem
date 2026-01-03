@@ -14,7 +14,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.*;
@@ -381,5 +384,60 @@ public class AFKManager {
         long m = (seconds % 3600) / 60;
         if (h > 0) return h + "h " + m + "m";
         return m + "m " + (seconds % 60) + "s";
+    }
+
+    public void openLeaderboard(Player player, int page, boolean fromSpirit) {
+        List<Map.Entry<String, Long>> sorted = getTopPlayers(); // 复用你已有的 getTopPlayers()
+        int totalPlayers = sorted.size();
+        int itemsPerRow = 9;
+        int totalPages = (int) Math.ceil((double) totalPlayers / itemsPerRow);
+        if (totalPages == 0) totalPages = 1;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        Inventory inv = Bukkit.createInventory(null, 27, "摸鱼排行榜 - 第 " + page + " 页");
+
+        // Row 1
+        if (page > 1) inv.setItem(0, createGuiItem(Material.PAPER, "§e上一页"));
+
+        if (fromSpirit) {
+            inv.setItem(4, createGuiItem(Material.IRON_DOOR, "§c⬅ 返回小精灵"));
+        }
+
+        inv.setItem(5, createGuiItem(Material.BOOK, "§b当前页: " + page + " / " + totalPages));
+
+        if (page < totalPages) inv.setItem(8, createGuiItem(Material.PAPER, "§e下一页"));
+
+        // Row 2 Glass
+        ItemStack glass = createGuiItem(Material.BLACK_STAINED_GLASS_PANE, "§r");
+        for (int i = 9; i < 18; i++) inv.setItem(i, glass);
+
+        // Row 3 Skulls
+        int startIndex = (page - 1) * itemsPerRow;
+        int endIndex = Math.min(startIndex + itemsPerRow, totalPlayers);
+        int slot = 18;
+
+        for (int i = startIndex; i < endIndex; i++) {
+            Map.Entry<String, Long> entry = sorted.get(i);
+            // 注意：AFKManager 的 getTopPlayers 返回的是 <Name, Time>，不是 UUID
+            // 为了获取头像，我们需要尽量尝试获取 OfflinePlayer (不一定准，但只能这样)
+            ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta meta = (SkullMeta) skull.getItemMeta();
+            meta.setOwningPlayer(Bukkit.getOfflinePlayer(entry.getKey())); // 尝试用名字获取
+            meta.setDisplayName("§e" + entry.getKey() + " §6#" + (i + 1));
+            meta.setLore(Collections.singletonList("§7摸鱼时长: §f" + formatDuration(entry.getValue()))); // 复用你的 formatDuration
+            skull.setItemMeta(meta);
+            inv.setItem(slot++, skull);
+        }
+
+        player.openInventory(inv);
+    }
+
+    private ItemStack createGuiItem(Material mat, String name) {
+        ItemStack item = new ItemStack(mat);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(name);
+        item.setItemMeta(meta);
+        return item;
     }
 }

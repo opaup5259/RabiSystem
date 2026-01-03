@@ -1,5 +1,7 @@
 package cn.rabitown.rabisystem.modules.warpStone.listener;
 
+import cn.rabitown.rabisystem.modules.spirit.ui.SpiritMenus;
+import cn.rabitown.rabisystem.modules.spirit.utils.SpiritUtils;
 import cn.rabitown.rabisystem.modules.warpStone.WarpStoneModule;
 import cn.rabitown.rabisystem.modules.warpStone.data.WarpStone;
 import cn.rabitown.rabisystem.modules.warpStone.manager.WarpManager;
@@ -179,6 +181,10 @@ public class WarpListener implements Listener {
 
             // 传送菜单
             if (title.equals(WarpMenus.TITLE_MENU)) {
+                if (event.getSlot() == 4 && event.getCurrentItem().getType() == Material.IRON_DOOR) {
+                    SpiritMenus.openMainMenu(player, SpiritUtils.getSpiritManager().getProfile(player.getUniqueId()), 1);
+                    return;
+                }
                 if (clicked.getType() == Material.ARROW) {
                     if (event.getSlot() == 6 || event.getSlot() == 8) {
                         ItemStack paper = event.getInventory().getItem(7);

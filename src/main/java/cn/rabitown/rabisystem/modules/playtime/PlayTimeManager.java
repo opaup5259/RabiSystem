@@ -121,8 +121,12 @@ public class PlayTimeManager {
         }
     }
 
-    // --- GUI 构建逻辑 ---
     public void openLeaderboard(Player player, int page) {
+        openLeaderboard(player, page, false);
+    }
+
+    // --- GUI 构建逻辑 ---
+    public void openLeaderboard(Player player, int page, boolean fromSpirit) {
         updateAllOnlineCache();
 
         List<Map.Entry<UUID, Long>> sortedList = totalPlaytime.entrySet().stream()
@@ -143,7 +147,13 @@ public class PlayTimeManager {
         if (page > 1) {
             inv.setItem(0, createItem(Material.PAPER, "§e上一页", "§7点击前往第 " + (page - 1) + " 页"));
         }
-        inv.setItem(4, createItem(Material.BOOK, "§b当前页: " + page + " / " + totalPages, "§7共 " + totalPlayers + " 名玩家记录"));
+        // Slot 4: 返回按钮 (联动)
+        if (fromSpirit) {
+            ItemStack back = createItem(Material.IRON_DOOR, "§c⬅ 返回小精灵", "§7回到灵契主界面");
+            // 可以在 Lore 或者 PDC 中标记这是一个联动按钮，或者 Listener 里判断 Slot
+            inv.setItem(4, back);
+        }
+        inv.setItem(5, createItem(Material.BOOK, "§b当前页: " + page + " / " + totalPages, "§7共 " + totalPlayers + " 名玩家记录"));
         if (page < totalPages) {
             inv.setItem(8, createItem(Material.PAPER, "§e下一页", "§7点击前往第 " + (page + 1) + " 页"));
         }

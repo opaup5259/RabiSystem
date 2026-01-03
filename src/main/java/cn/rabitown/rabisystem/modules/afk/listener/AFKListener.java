@@ -1,12 +1,15 @@
 package cn.rabitown.rabisystem.modules.afk.listener;
 
 import cn.rabitown.rabisystem.modules.afk.AFKModule;
+import cn.rabitown.rabisystem.modules.spirit.ui.SpiritMenus;
+import cn.rabitown.rabisystem.modules.spirit.utils.SpiritUtils;
 import com.destroystokyo.paper.event.player.PlayerPickupExperienceEvent;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
 public class AFKListener implements Listener {
@@ -22,6 +26,19 @@ public class AFKListener implements Listener {
 
     public AFKListener(AFKModule module) {
         this.module = module;
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!event.getView().getTitle().startsWith("摸鱼排行榜")) return;
+        event.setCancelled(true);
+        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
+
+        Player player = (Player) event.getWhoClicked();
+        if (event.getSlot() == 4 && event.getCurrentItem().getType() == Material.IRON_DOOR) {
+            SpiritMenus.openMainMenu(player, SpiritUtils.getSpiritManager().getProfile(player.getUniqueId()), 2);
+        }
+        // 翻页逻辑略... (类似 PlayTime)
     }
 
     @EventHandler

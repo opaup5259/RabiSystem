@@ -51,317 +51,352 @@ public class SpiritMenus {
     };
 
     /**
-     * 打开主菜单 (54格)
+     * 打开主菜单 (默认第一页)
      */
     public static void openMainMenu(Player player, SpiritProfile profile) {
-        Inventory inv = Bukkit.createInventory(new SpiritHolder(profile.getOwnerId(), "MAIN"), 54, Component.text(MAIN_TITLE));
+        openMainMenu(player, profile, 1);
+    }
 
-        // 获取当前时间戳
+    /**
+     * 打开主菜单 (指定页码)
+     */
+    public static void openMainMenu(Player player, SpiritProfile profile, int page) {
+        SpiritHolder holder = new SpiritHolder(profile.getOwnerId(), "MAIN", page);
+        // 如果是第二页，标题加个后缀提示
+        Inventory inv = Bukkit.createInventory(holder, 54, Component.text(MAIN_TITLE + (page > 1 ? " (P2)" : "")));
+
         long now = System.currentTimeMillis();
         long expireTime = profile.getReunionExpireTime();
         int level = profile.getLevel();
 
-        // 1. 生命反哺 (Heal Back) - Lv.1
-        // 从 LevelSystem 获取数值
-        double healAmount = LevelSystem.getHealAmount(level);
-        int healMoodCost = LevelSystem.getHealMoodCost(level);
-        String moodCostText = (healMoodCost == 0) ? "§a无消耗 (Lv.50特性)" : "§c-" + healMoodCost + " 点";
+        // 统一背景板
+        ItemStack whiteGlass = createSpacer(Material.WHITE_STAINED_GLASS_PANE);
+        ItemStack blackGlass = createSpacer(Material.BLACK_STAINED_GLASS_PANE);
 
-        placeAbilitySwitch(inv, 0, Material.GOLDEN_APPLE, "生命反哺", 1, level, profile.isHealBackEnabled(),
-                "§7§o『以灵之血，补契约者之缺。』",
-                "§8§m-----------------------",
-                "§e[✦ 当前属性]",
-                "§7触发条件: §f生命 < 12.0",
-                "§7治疗效果: §a+" + (int)healAmount + " HP §7(每5秒)",
-                "§7心情消耗: " + moodCostText,
-                "§8§m-----------------------",
-                "§7“它并不理解痛苦，却能感受到你的虚弱。",
-                "§7即便燃尽微弱的荧光，也想拉住你下坠的衣角。”",
-                ""
-        );
+        if (page == 1) {
+            // ==================== Page 1 ====================
 
-        // 2. 灵力共鸣 (Resonance) - Lv.30
-        String strTier = LevelSystem.getResonanceTierName(level);
-        int strCdSeconds = (int) (LevelSystem.getResonanceCooldown(level) / 1000);
-        int strDuration = LevelSystem.getResonanceDurationTicks(level) / 20;
+            // --- Row 0 ---
+            inv.setItem(0, whiteGlass);
+            inv.setItem(1, whiteGlass);
+            inv.setItem(2, whiteGlass);
+            inv.setItem(3, whiteGlass);
+            inv.setItem(4, createBundlePreview(profile)); // 小精灵背包
+            inv.setItem(5, whiteGlass);
+            inv.setItem(6, whiteGlass);
+            inv.setItem(7, createSignInIcon(profile)); // 岁月铭刻 (签到)
+            inv.setItem(8, createLotteryIcon(profile)); // 星界祈愿
 
-        placeAbilitySwitch(inv, 1, Material.DRAGON_BREATH, "灵力共鸣", 30, level, profile.isResonanceEnabled(),
-                "§7§o『灵魂的波长若能重叠，凡铁亦可斩钢。』",
-                "§8§m-----------------------",
-                "§e[✦ 当前属性]",
-                "§7触发条件: §f造成攻击",
-                "§7共鸣效果: §b力量 " + strTier + " §7(持续 " + strDuration + "s)",
-                "§7冷却时间: §f" + strCdSeconds + " 秒",
-                "§8§m-----------------------",
-                "§7“听，那是灵魂交织的旋律。",
-                "§7当你们心意相通，世界的星辰也会为你助阵。”",
-                ""
-        );
-
-        // 3. 灵力迸发 (Burst) - Lv.50
-        double burstDmg = LevelSystem.getBurstDamage(level);
-        int burstCdSeconds = (int) (LevelSystem.getBurstCooldown(level) / 1000);
-
-        placeAbilitySwitch(inv, 2, Material.END_CRYSTAL, "灵力迸发", 50, level, profile.isBurstEnabled(),
-                "§7§o『星屑汇聚之时，即是审判降临之刻。』",
-                "§8§m-----------------------",
-                "§e[✦ 当前属性]",
-                "§7触发条件: §f攻击/被击",
-                "§7迸发伤害: §6" + (int)burstDmg + " 点真实伤害",
-                "§7冷却时间: §f" + burstCdSeconds + " 秒",
-                "§7蓄力时间: §b3 秒",
-                "§8§m-----------------------",
-                "§7“平日里它收敛锋芒，只在你身后起舞。",
-                "§7但若有敌意逼近，它将化作你手中锋利的长枪。”",
-                ""
-        );
-
-        // 4. 灵魂代偿 (Soul Compensate) - Lv.80
-        placeAbilitySwitch(inv, 3, Material.TOTEM_OF_UNDYING, "灵魂代偿", 80, level, profile.isSoulCompensateEnabled(),
-                "§7§o『这是终极的契约——以此身破碎，换你无恙。』",
-                "§8§m-----------------------",
-                "§e[✦ 能力详解]",
-                "§7触发条件: §c致死伤害",
-                "§7守护效果: §a免疫死亡 §7+ §d强力Buff",
-                "§7触发代价: §c-50 心情 §7& §c10分钟 重聚",
-                "§8§m-----------------------",
-                "§7“星辰陨落是为了让黎明升起。",
-                "§7它将化作最亮的流星，坠入你名为‘生’的梦里。”",
-                ""
-        );
-
-        // 成就(6) 与 隐私(7)
-//        inv.setItem(6, createItem(Material.WRITABLE_BOOK, "§e🏆 成就铭刻", "§7查看你的里程碑"));
-        // --- 动态计算成就进度 ---
-        // 获取总成就数量 玩家已解锁数量
-        int totalAchs = Achievement.values().length;
-        int unlockedCount = profile.getUnlockedAchievements().size();
-        // 计算百分比
-        int progressPercent = (totalAchs > 0) ? (int) ((double) unlockedCount / totalAchs * 100) : 0;
-
-        inv.setItem(5, createItem(Material.SPYGLASS, "§b§l📊 在线时长录",
-                "§7§o『 窥探现世灵力波动，",
-                "§7§o   知晓何人活跃于此。 』",
-                "§8§m-----------------------",
-                "§e[✦ 功能 ✦]",
-                "§f查看当前在线玩家的统计数据。",
-                "§8§m-----------------------",
-                "§e▶ 点击查看"
-        ));
-        // 设置图标 (显示进度条和具体数值)
-        inv.setItem(6, createItem(Material.WRITABLE_BOOK, "§e🏆 成就铭刻",
-                "§7§o『凡走过必留下痕迹，凡经历必化作星光。』",
-                "§8§m-----------------------",
-                "§7当前进度: §a" + progressPercent + "%",
-                "§7已解锁: §f" + unlockedCount + " / " + totalAchs,
-                "",
-                "§e▶ 点击查看里程碑"
-        ));
-//        inv.setItem(7, createItem(Material.BARRIER, "§b§l🛡 展开隐秘帷幕",
-//                "§7§o『在喧嚣的世界中，划出一片只属于你们的静谧。』",
-//                "§8§m-----------------------",
-//                "§e[✦ 认知干扰 ✦]",
-//                "§f当前状态: §a所有人可见",
-//                "§7(该功能开发中...)", // 或者根据实际逻辑显示
-//                "§8§m-----------------------",
-//                "§e▶ 点击切换可见性"
-//        ));
-
-        boolean hideState = profile.isHideOthers();
-        ItemStack barrier = createItem(hideState ? Material.BARRIER : Material.HEAVY_CORE, // 开启干扰用空心结构，关闭用屏障
-                "§b🛡 认知干扰 (屏蔽他人)",
-                "§7当前状态: " + (hideState ? "§a[✔ 已开启]" : "§c[✘ 已关闭]"),
-                "§7开启后，你将 §c看不到 §7其他玩家的小精灵",
-                "",
-                "§e▶ 点击切换"
-        );
-        // 如果开启，添加附魔光效
-        if (hideState) {
-            ItemMeta meta = barrier.getItemMeta();
-            meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
-            meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-            barrier.setItemMeta(meta);
-        }
-        inv.setItem(7, barrier);
-
-        // 重聚/收回按钮 (8)
-        if (expireTime > now) {
-            ItemStack reuniting = new ItemStack(Material.SOUL_LANTERN);
-            ItemMeta meta = reuniting.getItemMeta();
-            meta.displayName(Component.text("§c§l⚡ 灵魂重聚中...").decoration(TextDecoration.ITALIC, false));
-            long remainingMillis = expireTime - now;
-            long mins = (remainingMillis / 1000) / 60;
-            List<Component> lore = new ArrayList<>();
-            lore.add(Component.text("§7§o『破碎的灵魂正在灯火中缓慢聚合。』").decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text("§7小精灵的灵体正在灯笼中缓慢修复。").decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text("").decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text("§7剩余时间: §f" + mins + " 分 ").decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false));
-            meta.lore(lore);
-            meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
-            meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-            reuniting.setItemMeta(meta);
-            inv.setItem(8, reuniting);
-        } else if (profile.isSummoned()) {
-//            ItemStack dismiss = new ItemStack(Material.SOUL_LANTERN);
-//            ItemMeta meta = dismiss.getItemMeta();
-//            meta.displayName(Component.text("§c§l收回小精灵").decoration(TextDecoration.ITALIC, false));
-//            meta.lore(Arrays.asList(Component.text("§7点击将小精灵送回灵契空间。")));
-//            dismiss.setItemMeta(meta);
-//            inv.setItem(8, dismiss);
-            inv.setItem(8, createItem(Material.SOUL_LANTERN, "§c§l⚛ 回归灵契空间",
-                    "§7§o『暂时的分别，是为了更好的重逢。』",
+            // --- Row 1 ---
+            // 技能树
+            inv.setItem(9, createItem(Material.TORCHFLOWER, "§6🌳 技能树", "§7查看各阶段的觉醒能力", "§7选择激活的技能树", "","§e▶ 点击进入技能树界面"));
+            // 灵核
+            inv.setItem(10, createCoreIcon(player, profile));
+            // 日程
+            inv.setItem(11, createScheduleIcon(profile));
+            // 真名刻印
+            inv.setItem(12, createItem(Material.NAME_TAG, "§d§l🏷 真名刻印",
+                    "§7§o『名字是灵魂的锚点，』",
                     "§8§m-----------------------",
-                    "§e[✦ 灵魂休眠 ✦]",
-                    "§f将小精灵送回灵契空间休息。",
-                    "§f(双击潜行可再次呼唤)",
+                    "§e[✦ 灵魂羁绊 ✦]",
+                    "§f赋予小精灵独一无二的 §d真名§f。",
+                    "§f当前名字: §r" + profile.getName(),
+                    "§c消耗: 命名牌 x1",
                     "§8§m-----------------------",
-                    "§e▶ 点击收回小精灵"
+                    "§e▶ 请携带命名牌点击"
             ));
-        }
 
-        // --- Row 1 (第二行): 签到行 (原 Row 2) ---
-        fillRow(inv, 9, Material.BLACK_STAINED_GLASS_PANE);
+            // 灵韵流光 (特效)
+            ItemStack effectIcon = new ItemStack(Material.NETHER_STAR);
+            ItemMeta effectMeta = effectIcon.getItemMeta();
+            effectMeta.displayName(Component.text("§d§l✨ 灵韵流光").decoration(TextDecoration.ITALIC, false));
+            effectMeta.lore(Arrays.asList(
+                    Component.text("§7§o『它是星辰的碎片，是环绕你身侧的微光。』").decoration(TextDecoration.ITALIC, false),
+                    Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
+                    Component.text("§e[✦ 灵子形态 ✦]").decoration(TextDecoration.ITALIC, false),
+                    Component.text("§f当前特效: §d" + profile.getActiveEffect().getName()).decoration(TextDecoration.ITALIC, false),
+                    Component.text("§f调整小精灵周身的粒子光环。").decoration(TextDecoration.ITALIC, false),
+                    Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
+                    Component.text("§e▶ 点击配置灵韵").decoration(TextDecoration.ITALIC, false)
+            ));
+            effectIcon.setItemMeta(effectMeta);
+            inv.setItem(13, effectIcon);
 
-        // --- Row 2 (第三行): 装备、食物行 (原 Row 3) ---
-        // 对应原 Slot 27-35 -> 现 Slot 18-26
-        inv.setItem(18, createSpacer(Material.BLACK_STAINED_GLASS_PANE));
-
-        // 装备区
-        inv.setItem(19, createItem(Material.IRON_PICKAXE, "§e🗡 装备栏位", "§7(右侧) 放置主手物品", "§7小精灵将手持该物品"));
-        placePhysicalSlot(inv, 20, profile.getEquipItem(0), "§7[主手装备]", 10, profile.getLevel()); // 物理槽 A
-
-        inv.setItem(21, createSpacer(Material.BLACK_STAINED_GLASS_PANE));
-        inv.setItem(22, createSignInIcon(profile));
-
-        inv.setItem(26, createSpacer(Material.BLACK_STAINED_GLASS_PANE));
-
-        // 自动饮食开关
-        inv.setItem(26, createSwitch(Material.CAKE, "§6🍗 自动饮食", profile.isAutoEat(), 10, profile.getLevel()));
-
-        inv.setItem(23, createSpacer(Material.BLACK_STAINED_GLASS_PANE));
-
-        // 食物袋
-        inv.setItem(24, createItem(Material.HAY_BLOCK, "§6🥪 零食收纳", "§7放置食物在右侧"));
-        ItemStack foodFirst = (profile.getFoodBag().length > 0) ? profile.getFoodBag()[0] : null;
-        placePhysicalSlot(inv, 25, foodFirst, "§a🍎 快捷投喂 [B]", 10, profile.getLevel()); // 物理槽 B
-
-        // --- Row 3 (第四行): 黑色玻璃隔断 (原 Row 4) ---
-        fillRow(inv, 27, Material.BLACK_STAINED_GLASS_PANE);
-
-        // --- Row 4 (第五行): 核心功能 (原 Row 1) ---
-        // Slot 33: 主动技能
-        ItemStack activeItem;
-        if (profile.getActiveSkillId() != null) {
-            SkillType skill = SkillType.fromId(profile.getActiveSkillId());
-            if (skill != null) {
-                activeItem = createItem(skill.getIcon(), "§6★ 主动技能: " + skill.getName(),
-                        "§7" + String.join("\n§7", skill.getDescription()),
-                        "", "§e[Shift+F 触发]");
-                ItemMeta meta = activeItem.getItemMeta();
-                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                activeItem.setItemMeta(meta);
+            // 幻形之镜
+            if (profile.hasAnyUnlockedSkin()) {
+                ItemStack skinIcon = new ItemStack(Material.AMETHYST_CLUSTER);
+                ItemMeta skinMeta = skinIcon.getItemMeta();
+                skinMeta.displayName(Component.text("§b§l🦋 幻形之镜").decoration(TextDecoration.ITALIC, false));
+                skinMeta.lore(Arrays.asList(
+                        Component.text("§7§o『唯有灵魂始终如一。』").decoration(TextDecoration.ITALIC, false),
+                        Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
+                        Component.text("§e[✦ 幻化之镜 ✦]").decoration(TextDecoration.ITALIC, false),
+                        Component.text("§f当前形态: §a" + getSkinDisplayName(profile.getCurrentSkin())).decoration(TextDecoration.ITALIC, false),
+                        Component.text("§f改变小精灵的实体形态。").decoration(TextDecoration.ITALIC, false),
+                        Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
+                        Component.text("§e▶ 点击进行幻化").decoration(TextDecoration.ITALIC, false)
+                ));
+                skinIcon.setItemMeta(skinMeta);
+                inv.setItem(14, skinIcon);
             } else {
-                activeItem = createItem(Material.STRUCTURE_VOID, "§7主动技能槽", "§7(数据异常)");
+                ItemStack locked = new ItemStack(Material.STRUCTURE_VOID);
+                ItemMeta lMeta = locked.getItemMeta();
+                lMeta.displayName(Component.text("§8🔒 幻形之镜 (未解锁)").decoration(TextDecoration.ITALIC, false));
+                lMeta.lore(Arrays.asList(
+                        Component.text("§7当你在成就铭刻的道路上"),
+                        Component.text("§7有所建树时，此功能将自动开启。")
+                ));
+                locked.setItemMeta(lMeta);
+                inv.setItem(14, locked);
             }
-        } else {
-            activeItem = createItem(Material.STRUCTURE_VOID, "§7主动技能槽", "§7在技能树中点击【主动技能】装备");
-        }
-        inv.setItem(33, activeItem);
 
-        // Slot 34, 35: 快捷技能
-        List<String> quicks = profile.getQuickSkillIds();
-        for (int i = 0; i < 2; i++) {
-            int slot = 34 + i;
-            ItemStack quickItem;
-            if (i < quicks.size()) {
-                SkillType skill = SkillType.fromId(quicks.get(i));
+            inv.setItem(15, whiteGlass); // 空白
+            inv.setItem(16, whiteGlass); // 空白
+
+            // 成就铭刻 (动态计算)
+            int totalAchs = Achievement.values().length;
+            int unlockedCount = profile.getUnlockedAchievements().size();
+            int progressPercent = (totalAchs > 0) ? (int) ((double) unlockedCount / totalAchs * 100) : 0;
+            inv.setItem(17, createItem(Material.WRITABLE_BOOK, "§e🏆 成就铭刻",
+                    "§7§o『凡走过必留下痕迹，凡经历必化作星光。』",
+                    "§8§m-----------------------",
+                    "§7当前进度: §a" + progressPercent + "%",
+                    "§7已解锁: §f" + unlockedCount + " / " + totalAchs,
+                    "",
+                    "§e▶ 点击查看里程碑"
+            ));
+
+            // --- Row 2 ---
+            fillRow(inv, 18, Material.BLACK_STAINED_GLASS_PANE);
+
+            // --- Row 3 ---
+            inv.setItem(27, createItem(Material.IRON_PICKAXE, "§e🗡 装备栏位", "§7(右侧) 放置主手物品", "§7小精灵将手持该物品"));
+            placePhysicalSlot(inv, 28, profile.getEquipItem(0), "§7[主手装备]", 10, profile.getLevel()); // Slot 28 物理槽
+
+            inv.setItem(29, blackGlass);
+
+            // 主动技能
+            ItemStack activeItem;
+            if (profile.getActiveSkillId() != null) {
+                SkillType skill = SkillType.fromId(profile.getActiveSkillId());
                 if (skill != null) {
-                    quickItem = createItem(skill.getIcon(), "§b⚡ 快捷技能: " + skill.getName(),
+                    activeItem = createItem(skill.getIcon(), "§6★ 主动技能: " + skill.getName(),
                             "§7" + String.join("\n§7", skill.getDescription()),
-                            "", "§e[点击释放]");
+                            "", "§e[Shift+F 触发]");
+                    ItemMeta meta = activeItem.getItemMeta();
+                    meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    activeItem.setItemMeta(meta);
                 } else {
-                    quickItem = createItem(Material.STRUCTURE_VOID, "§7快捷技能槽", "§7(数据异常)");
+                    activeItem = createItem(Material.STRUCTURE_VOID, "§7主动技能槽", "§7(数据异常)");
                 }
             } else {
-                quickItem = createItem(Material.STRUCTURE_VOID, "§7快捷技能槽", "§7在技能树中点击【快捷技能】装备");
+                activeItem = createItem(Material.STRUCTURE_VOID, "§7主动技能槽", "§7在技能树中点击【主动技能】装备");
             }
-            inv.setItem(slot, quickItem);
-        }
+            inv.setItem(30, activeItem);
 
-        // 对应原 Slot 9-17 -> 现 Slot 36-44
-        inv.setItem(36, createCoreIcon(player, profile)); // 核心
-        inv.setItem(37, createScheduleIcon(profile));    // 日程
-//        inv.setItem(38, createItem(Material.NAME_TAG, "§d🏷 真名刻印", "§7赋予小精灵独一无二的名字", "§c消耗: 命名牌 x1"));
-        inv.setItem(38, createItem(Material.NAME_TAG, "§d§l🏷 真名刻印",
-                "§7§o『名字是灵魂的锚点，』",
-                "§8§m-----------------------",
-                "§e[✦ 灵魂羁绊 ✦]",
-                "§f赋予小精灵独一无二的 §d真名§f。",
-                "§f当前名字: §r" + profile.getName(),
-                "§c消耗: 命名牌 x1",
-                "§8§m-----------------------",
-                "§e▶ 请携带命名牌点击"
-        ));
-        inv.setItem(39, createVoidGravityIcon(profile)); // 引力
+            // 快捷技能
+            List<String> quicks = profile.getQuickSkillIds();
+            for (int i = 0; i < 2; i++) {
+                int slot = 31 + i;
+                ItemStack quickItem;
+                if (i < quicks.size()) {
+                    SkillType skill = SkillType.fromId(quicks.get(i));
+                    if (skill != null) {
+                        quickItem = createItem(skill.getIcon(), "§b⚡ 快捷技能: " + skill.getName(),
+                                "§7" + String.join("\n§7", skill.getDescription()),
+                                "", "§e[点击释放]");
+                    } else {
+                        quickItem = createItem(Material.STRUCTURE_VOID, "§7快捷技能槽", "§7(数据异常)");
+                    }
+                } else {
+                    quickItem = createItem(Material.STRUCTURE_VOID, "§7快捷技能槽", "§7在技能树中点击【快捷技能】装备");
+                }
+                inv.setItem(slot, quickItem);
+            }
 
-        // 幻化外观
-        ItemStack effectIcon = new ItemStack(Material.NETHER_STAR);
-        ItemMeta effectMeta = effectIcon.getItemMeta();
-        effectMeta.displayName(Component.text("§d§l✨ 灵韵流光").decoration(TextDecoration.ITALIC, false));
-        effectMeta.lore(Arrays.asList(
-                Component.text("§7§o『它是星辰的碎片，是环绕你身侧的微光。』").decoration(TextDecoration.ITALIC, false),
-                Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
-                Component.text("§e[✦ 灵子形态 ✦]").decoration(TextDecoration.ITALIC, false),
-                Component.text("§f当前特效: §d" + profile.getActiveEffect().getName()).decoration(TextDecoration.ITALIC, false),
-                Component.text("§f调整小精灵周身的粒子光环。").decoration(TextDecoration.ITALIC, false),
-                Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
-                Component.text("§e▶ 点击配置灵韵").decoration(TextDecoration.ITALIC, false)
-        ));
-        effectIcon.setItemMeta(effectMeta);
-        inv.setItem(40, effectIcon);
+            inv.setItem(33, blackGlass);
+            inv.setItem(34, createItem(Material.HAY_BLOCK, "§6🥪 零食收纳", "§7放置食物在右侧"));
+            ItemStack foodFirst = (profile.getFoodBag().length > 0) ? profile.getFoodBag()[0] : null;
+            placePhysicalSlot(inv, 35, foodFirst, "§a🍎 快捷投喂 [B]", 10, profile.getLevel()); // Slot 35 物理槽
 
-        // Slot 41: 幻形之镜 (幻化系统)
-        if (profile.hasAnyUnlockedSkin()) {
-            ItemStack skinIcon = new ItemStack(Material.AMETHYST_CLUSTER);
-            ItemMeta skinMeta = skinIcon.getItemMeta();
-            skinMeta.displayName(Component.text("§b§l🦋 幻形之镜").decoration(TextDecoration.ITALIC, false));
-            skinMeta.lore(Arrays.asList(
-                    Component.text("§7§o『唯有灵魂始终如一。』").decoration(TextDecoration.ITALIC, false),
-                    Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
-                    Component.text("§e[✦ 幻化之镜 ✦]").decoration(TextDecoration.ITALIC, false),
-                    Component.text("§f当前形态: §a" + getSkinDisplayName(profile.getCurrentSkin())).decoration(TextDecoration.ITALIC, false),
-                    Component.text("§f改变小精灵的实体形态。").decoration(TextDecoration.ITALIC, false),
-                    Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false),
-                    Component.text("§e▶ 点击进行幻化").decoration(TextDecoration.ITALIC, false)
-            ));
-            skinIcon.setItemMeta(skinMeta);
-            inv.setItem(41, skinIcon);
+            // --- Row 4 ---
+            fillRow(inv, 36, Material.BLACK_STAINED_GLASS_PANE);
+
+            // --- Row 5 ---
+            inv.setItem(45, whiteGlass);
+            inv.setItem(46, whiteGlass);
+            inv.setItem(47, whiteGlass);
+            inv.setItem(48, whiteGlass);
+            // 传送石界面入口
+            inv.setItem(49, createItem(Material.LODESTONE, "§b§l🌌 传送石", "§7管理你的传送锚点", "§e▶ 点击进入"));
+            inv.setItem(50, whiteGlass);
+            inv.setItem(51, whiteGlass);
+            inv.setItem(52, whiteGlass);
+            inv.setItem(53, createItem(Material.ARROW, "§f下一页 ▶", "§7前往功能页"));
+
         } else {
-            // 未解锁显示结构空位
-            ItemStack locked = new ItemStack(Material.STRUCTURE_VOID);
-            ItemMeta lMeta = locked.getItemMeta();
-            lMeta.displayName(Component.text("§8🔒 幻形之镜 (未解锁)").decoration(TextDecoration.ITALIC, false));
-            lMeta.lore(Arrays.asList(
-                    Component.text("§7当你在成就铭刻的道路上"),
-                    Component.text("§7有所建树时，此功能将自动开启。")
+            // ==================== Page 2 ====================
+
+            // --- Row 0 ---
+            fillRow(inv, 0, Material.BLACK_STAINED_GLASS_PANE);
+
+            // --- Row 1 (能力开关) ---
+            // 1. 生命反哺 (Heal Back) - Lv.1
+            double healAmount = LevelSystem.getHealAmount(level);
+            int healMoodCost = LevelSystem.getHealMoodCost(level);
+            String moodCostText = (healMoodCost == 0) ? "§a无消耗 (Lv.50特性)" : "§c-" + healMoodCost + " 点";
+            placeAbilitySwitch(inv, 9, Material.GOLDEN_APPLE, "生命反哺", 1, level, profile.isHealBackEnabled(),
+                    "§7§o『以灵之血，补契约者之缺。』",
+                    "§8§m-----------------------",
+                    "§e[✦ 当前属性]",
+                    "§7触发条件: §f生命 < 12.0",
+                    "§7治疗效果: §a+" + (int)healAmount + " HP §7(每5秒)",
+                    "§7心情消耗: " + moodCostText,
+                    "§8§m-----------------------",
+                    "§7“它并不理解痛苦，却能感受到你的虚弱。",
+                    "§7即便燃尽微弱的荧光，也想拉住你下坠的衣角。”",
+                    "");
+
+            // 2. 灵力共鸣 (Resonance) - Lv.30
+            String strTier = LevelSystem.getResonanceTierName(level);
+            int strCdSeconds = (int) (LevelSystem.getResonanceCooldown(level) / 1000);
+            int strDuration = LevelSystem.getResonanceDurationTicks(level) / 20;
+            placeAbilitySwitch(inv, 10, Material.DRAGON_BREATH, "灵力共鸣", 30, level, profile.isResonanceEnabled(),
+                    "§7§o『灵魂的波长若能重叠，凡铁亦可斩钢。』",
+                    "§8§m-----------------------",
+                    "§e[✦ 当前属性]",
+                    "§7触发条件: §f造成攻击",
+                    "§7共鸣效果: §b力量 " + strTier + " §7(持续 " + strDuration + "s)",
+                    "§7冷却时间: §f" + strCdSeconds + " 秒",
+                    "§8§m-----------------------",
+                    "§7“听，那是灵魂交织的旋律。",
+                    "§7当你们心意相通，世界的星辰也会为你助阵。”",
+                    "");
+
+            // 3. 灵力迸发 (Burst) - Lv.50
+            double burstDmg = LevelSystem.getBurstDamage(level);
+            int burstCdSeconds = (int) (LevelSystem.getBurstCooldown(level) / 1000);
+            placeAbilitySwitch(inv, 11, Material.END_CRYSTAL, "灵力迸发", 50, level, profile.isBurstEnabled(),
+                    "§7§o『星屑汇聚之时，即是审判降临之刻。』",
+                    "§8§m-----------------------",
+                    "§e[✦ 当前属性]",
+                    "§7触发条件: §f攻击/被击",
+                    "§7迸发伤害: §6" + (int)burstDmg + " 点真实伤害",
+                    "§7冷却时间: §f" + burstCdSeconds + " 秒",
+                    "§7蓄力时间: §b3 秒",
+                    "§8§m-----------------------",
+                    "§7“平日里它收敛锋芒，只在你身后起舞。",
+                    "§7但若有敌意逼近，它将化作你手中锋利的长枪。”",
+                    "");
+
+            // 4. 灵魂代偿 (Soul Compensate) - Lv.80
+            placeAbilitySwitch(inv, 12, Material.TOTEM_OF_UNDYING, "灵魂代偿", 80, level, profile.isSoulCompensateEnabled(),
+                    "§7§o『这是终极的契约——以此身破碎，换你无恙。』",
+                    "§8§m-----------------------",
+                    "§e[✦ 能力详解]",
+                    "§7触发条件: §c致死伤害",
+                    "§7守护效果: §a免疫死亡 §7+ §d强力Buff",
+                    "§7触发代价: §c-50 心情 §7& §c10分钟 重聚",
+                    "§8§m-----------------------",
+                    "§7“星辰陨落是为了让黎明升起。",
+                    "§7它将化作最亮的流星，坠入你名为‘生’的梦里。”",
+                    "");
+
+            inv.setItem(13, blackGlass); // 空白 (改为黑玻璃)
+            inv.setItem(14, blackGlass); // 空白
+            inv.setItem(15, blackGlass); // 空白
+            inv.setItem(16, blackGlass); // 空白
+            inv.setItem(17, createVoidGravityIcon(profile)); // 虚空引力
+
+            // --- Row 2 ---
+            fillRow(inv, 18, Material.BLACK_STAINED_GLASS_PANE);
+
+            // --- Row 3 ---
+            fillRow(inv, 27, Material.BLACK_STAINED_GLASS_PANE);
+
+            // --- Row 4 ---
+            // 在线时长统计
+            inv.setItem(36, createItem(Material.SPYGLASS, "§b§l📊 在线时长录",
+                    "§7§o『 窥探现世灵力波动，",
+                    "§7§o   知晓何人活跃于此。 』",
+                    "§8§m-----------------------",
+                    "§e[✦ 功能 ✦]",
+                    "§f查看当前在线玩家的统计数据。",
+                    "§8§m-----------------------",
+                    "§e▶ 点击查看"
             ));
-            locked.setItemMeta(lMeta);
-            inv.setItem(41, locked);
+            // 摸鱼时长统计
+            inv.setItem(37, createItem(Material.FISHING_ROD, "§e§l🐟 摸鱼排行",
+                    "§7§o『 偷得浮生半日闲。 』",
+                    "§8§m-----------------------",
+                    "§e[✦ 功能 ✦]",
+                    "§f查看谁是最大的懒虫。",
+                    "§8§m-----------------------",
+                    "§e▶ 点击查看"
+            ));
+
+            inv.setItem(38, whiteGlass);
+            inv.setItem(39, whiteGlass);
+            inv.setItem(40, whiteGlass);
+            inv.setItem(41, whiteGlass);
+            inv.setItem(42, whiteGlass);
+
+            // 认知干扰
+            boolean hideState = profile.isHideOthers();
+            ItemStack barrier = createItem(hideState ? Material.BARRIER : Material.HEAVY_CORE,
+                    "§b🛡 认知干扰 (屏蔽他人)",
+                    "§7当前状态: " + (hideState ? "§a[✔ 已开启]" : "§c[✘ 已关闭]"),
+                    "§7开启后，你将 §c看不到 §7其他玩家的小精灵",
+                    "",
+                    "§e▶ 点击切换"
+            );
+            if (hideState) addGlow(barrier);
+            inv.setItem(43, barrier);
+
+            // 收回小精灵 / 重聚
+            if (expireTime > now) {
+                ItemStack reuniting = new ItemStack(Material.SOUL_LANTERN);
+                ItemMeta meta = reuniting.getItemMeta();
+                meta.displayName(Component.text("§c§l⚡ 灵魂重聚中...").decoration(TextDecoration.ITALIC, false));
+                long remainingMillis = expireTime - now;
+                long mins = (remainingMillis / 1000) / 60;
+                List<Component> lore = new ArrayList<>();
+                lore.add(Component.text("§7§o『破碎的灵魂正在灯火中缓慢聚合。』").decoration(TextDecoration.ITALIC, false));
+                lore.add(Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false));
+                lore.add(Component.text("§7小精灵的灵体正在灯笼中缓慢修复。").decoration(TextDecoration.ITALIC, false));
+                lore.add(Component.text("").decoration(TextDecoration.ITALIC, false));
+                lore.add(Component.text("§7剩余时间: §f" + mins + " 分 ").decoration(TextDecoration.ITALIC, false));
+                lore.add(Component.text("§8§m-----------------------").decoration(TextDecoration.ITALIC, false));
+                meta.lore(lore);
+                meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
+                meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+                reuniting.setItemMeta(meta);
+                inv.setItem(44, reuniting);
+            } else if (profile.isSummoned()) {
+                inv.setItem(44, createItem(Material.SOUL_LANTERN, "§c§l⚛ 回归灵契空间",
+                        "§7§o『暂时的分别，是为了更好的重逢。』",
+                        "§8§m-----------------------",
+                        "§e[✦ 灵魂休眠 ✦]",
+                        "§f将小精灵送回灵契空间休息。",
+                        "§f(双击潜行可再次呼唤)",
+                        "§8§m-----------------------",
+                        "§e▶ 点击收回小精灵"
+                ));
+            }
+
+            // --- Row 5 ---
+            inv.setItem(45, blackGlass);
+            inv.setItem(46, blackGlass);
+            inv.setItem(47, blackGlass);
+            inv.setItem(48, whiteGlass);
+            inv.setItem(49, whiteGlass);
+            inv.setItem(50, whiteGlass);
+            inv.setItem(51, whiteGlass);
+            inv.setItem(52, createItem(Material.ARROW, "§f◀ 上一页", "§7返回主页"));
+            inv.setItem(53, blackGlass);
         }
 
-        inv.setItem(44, createItem(Material.TORCHFLOWER, "§6🌳 技能树", "§7查看各阶段的觉醒能力", "§7选择激活的技能树", "","▶ 点击进入技能树界面"));
-
-        // --- Row 5 (第六行): 背包 (原 Row 0) ---
-        fillRow(inv, 45, Material.WHITE_STAINED_GLASS_PANE);
-        inv.setItem(49, createBundlePreview(profile)); // 45 + 4 = 49
-
-        // --- 星界祈愿按钮 (Slot 53) ---
-        inv.setItem(53, createLotteryIcon(profile));
-
-        player.openInventory(inv);
         player.openInventory(inv);
     }
 
@@ -594,7 +629,7 @@ public class SpiritMenus {
         return item;
     }
 
-    // 放置物理槽位 (如果未解锁显示结构空位，解锁显示 air 或物品)
+    // 放置物理槽位
     private static void placePhysicalSlot(Inventory inv, int slot, ItemStack currentItem, String name, int reqLv, int currentLv) {
         if (currentLv < reqLv) {
             ItemStack lock = new ItemStack(Material.STRUCTURE_VOID);
@@ -604,13 +639,8 @@ public class SpiritMenus {
             lock.setItemMeta(meta);
             inv.setItem(slot, lock);
         } else {
-            // 已解锁
             if (currentItem != null) {
                 inv.setItem(slot, currentItem);
-            } else {
-                // 如果是空位，不放任何东西 (Air)，允许玩家放入
-                // 为了提示，我们可以在 MenuListener 里处理：如果拿空了，是否显示 ghost item？
-                // 这里的逻辑是：如果是 Air，玩家可以直接放入。
             }
         }
     }
@@ -621,7 +651,6 @@ public class SpiritMenus {
      * @param descLore 可变参数，传入多行描述文本
      */
     private static void placeAbilitySwitch(Inventory inv, int slot, Material mat, String name, int reqLv, int currentLv, boolean state, String... descLore) {
-        // 1. 锁定状态 (等级不足)
         if (currentLv < reqLv) {
             ItemStack lock = new ItemStack(Material.STRUCTURE_VOID);
             ItemMeta meta = lock.getItemMeta();
@@ -632,39 +661,22 @@ public class SpiritMenus {
             ));
             lock.setItemMeta(meta);
             inv.setItem(slot, lock);
-        }
-        // 2. 解锁状态 (正常显示)
-        else {
+        } else {
             ItemStack item = new ItemStack(mat);
             ItemMeta meta = item.getItemMeta();
-
-            // 标题：根据状态变色
             String color = state ? "§a" : "§7";
             meta.displayName(Component.text(color + name).decoration(TextDecoration.ITALIC, false));
-
             List<Component> lore = new ArrayList<>();
-
-            // --- A. 状态指示 ---
             lore.add(Component.text("§7当前状态: " + (state ? "§a[✔ 已激活]" : "§c[✘ 已关闭]")).decoration(TextDecoration.ITALIC, false));
             lore.add(Component.text("§e▶ 点击切换").decoration(TextDecoration.ITALIC, false));
-            lore.add(Component.text("")); // 空行分隔
-
-            // --- B. 插入自定义描述 (核心修改点) ---
+            lore.add(Component.text(""));
             if (descLore != null) {
                 for (String line : descLore) {
-                    // 直接转换字符串为 Component，保持原有颜色代码
                     lore.add(Component.text(line).decoration(TextDecoration.ITALIC, false));
                 }
             }
-
             meta.lore(lore);
-
-            // 如果开启，增加附魔流光效果
-            if (state) {
-                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            }
-
+            if (state) addGlow(item);
             item.setItemMeta(meta);
             inv.setItem(slot, item);
         }

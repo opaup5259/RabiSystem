@@ -28,59 +28,69 @@ public class WarpMenus {
     }
 
     public void openWarpMenu(Player player, int page) {
-        player.playSound(player.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.0f, 1.0f);
+        openWarpMenu(player, page, false);
+    }
 
+    public void openWarpMenu(Player player, int page, boolean fromSpirit) {
         Inventory inv = Bukkit.createInventory(null, 54, TITLE_MENU);
-        List<WarpStone> allStones = new ArrayList<>();
 
-        for (WarpStone s : manager.getWarpStones().values()) {
-            boolean isMine = s.getOwner().equals(player.getUniqueId());
-            boolean isShared = s.getWhitelist().contains(player.getUniqueId());
-            boolean isPublic = s.isPublic();
-            if (isMine || isShared || isPublic) allStones.add(s);
+        // --- Row 0: Navigation ---
+        if (fromSpirit) {
+            inv.setItem(4, createGuiItem(Material.IRON_DOOR, "§c⬅ 返回小精灵"));
         }
 
-        allStones.sort((s1, s2) -> {
-            boolean s1Mine = s1.getOwner().equals(player.getUniqueId());
-            boolean s2Mine = s2.getOwner().equals(player.getUniqueId());
-            if (s1Mine && !s2Mine) return -1;
-            if (!s1Mine && s2Mine) return 1;
-            return Long.compare(s1.getCreated(), s2.getCreated());
-        });
-
-        int slotsPerPage = 36;
-        int totalStones = allStones.size();
-        int totalPages = (int) Math.ceil((double) totalStones / slotsPerPage);
-        if (totalPages == 0) totalPages = 1;
-        if (page > totalPages) page = totalPages;
-
-        if (page > 1) inv.setItem(6, createGuiItem(Material.ARROW, ChatColor.YELLOW + "上一页"));
-        inv.setItem(7, createGuiItem(Material.PAPER, "第 " + page + " 页"));
-        if (page < totalPages) inv.setItem(8, createGuiItem(Material.ARROW, ChatColor.YELLOW + "下一页"));
-
+        // --- Row 1: Separation Glass ---
         ItemStack glass = createGuiItem(Material.BLACK_STAINED_GLASS_PANE, " ");
         for (int i = 9; i < 18; i++) inv.setItem(i, glass);
 
+        // --- Data Sorting ---
+        List<WarpStone> myStones = new ArrayList<>();
+        List<WarpStone> otherStones = new ArrayList<>();
+
+        for (WarpStone s : manager.getWarpStones().values()) {
+            if (s.getOwner().equals(player.getUniqueId())) {
+                myStones.add(s);
+            } else if (s.isPublic() || s.getWhitelist().contains(player.getUniqueId())) {
+                otherStones.add(s);
+            }
+        }
+
+        // --- Row 2: My Stones (Index 18-26) ---
+        // 显示最多 9 个自己的传送石
+        for (int i = 0; i < Math.min(9, myStones.size()); i++) {
+            inv.setItem(18 + i, createStoneIcon(myStones.get(i)));
+        }
+
+        // --- Row 3+: Other Stones (Index 27-53) ---
+        // 区域大小: 54 - 27 = 27 格
+        int slotsPerPage = 27;
+        int totalOthers = otherStones.size();
+        int totalPages = (int) Math.ceil((double) totalOthers / slotsPerPage);
+        if (totalPages == 0) totalPages = 1;
+        if (page > totalPages) page = totalPages;
+
         int startIndex = (page - 1) * slotsPerPage;
-        int endIndex = Math.min(startIndex + slotsPerPage, totalStones);
+        int endIndex = Math.min(startIndex + slotsPerPage, totalOthers);
 
         for (int i = startIndex; i < endIndex; i++) {
-            WarpStone s = allStones.get(i);
-            ItemStack item = new ItemStack(s.getIcon());
-            ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName(ChatColor.GOLD + s.getName());
-
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.AQUA + String.format("坐标: %d, %d, %d", s.getLocation().getBlockX(), s.getLocation().getBlockY(), s.getLocation().getBlockZ()));
-            lore.add(getFormattedDim(s.getLocation().getWorld()));
-            lore.add(ChatColor.GRAY + "所有者: " + Bukkit.getOfflinePlayer(s.getOwner()).getName());
-
-            meta.setLore(lore);
-            meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "stone_key"), PersistentDataType.STRING, s.getName());
-            item.setItemMeta(meta);
-            inv.setItem(18 + (i - startIndex), item);
+            inv.setItem(27 + (i - startIndex), createStoneIcon(otherStones.get(i)));
         }
+
+        // Pagination buttons (Row 0 Corners)
+        if (page > 1) inv.setItem(0, createGuiItem(Material.ARROW, ChatColor.YELLOW + "上一页"));
+        inv.setItem(8, createGuiItem(Material.PAPER, "第 " + page + " 页")); // Right corner just shows page
+        if (page < totalPages) inv.setItem(8, createGuiItem(Material.ARROW, ChatColor.YELLOW + "下一页")); // Overwrite if next exists
+
         player.openInventory(inv);
+    }
+
+    private ItemStack createStoneIcon(WarpStone s) {
+        ItemStack item = new ItemStack(s.getIcon());
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatColor.GOLD + s.getName());
+        meta.getPersistentDataContainer().set(new NamespacedKey(plugin, "stone_key"), PersistentDataType.STRING, s.getName());
+        item.setItemMeta(meta);
+        return item;
     }
 
     public void openSettingsMenu(Player player, WarpStone stone) {
