@@ -21,3 +21,11 @@ commands:
     whitelist: # 覆盖原版 whitelist 指令
       description: 白名单管理
       usage: /whitelist <accept|deny>
+  afk:
+    description: 切换挂机状态
+    usage: /afk
+    aliases: [moyu]
+    afkrank:
+      description: 查看摸鱼排行榜
+      usage: /afkrank
+}

@@ -3,7 +3,9 @@ package cn.rabitown.rabisystem.core.manager;
 
 import cn.rabitown.rabisystem.RabiSystem;
 import cn.rabitown.rabisystem.api.IRabiModule;
+import cn.rabitown.rabisystem.modules.afk.AFKModule;
 import cn.rabitown.rabisystem.modules.corpse.CorpseModule;
+import cn.rabitown.rabisystem.modules.laji.LajiModule;
 import cn.rabitown.rabisystem.modules.playtime.PlayTimeModule;
 import cn.rabitown.rabisystem.modules.prefix.PrefixModule;
 import cn.rabitown.rabisystem.modules.spirit.SpiritModule;
@@ -28,6 +30,8 @@ public class ModuleManager {
         registerModule(new CorpseModule()); // ✅ 注册跑尸模块
         registerModule(new WarpStoneModule()); // ✅ 注册传送石模块
         registerModule(new PlayTimeModule()); // ✅ 注册游戏时间统计模块
+        registerModule(new AFKModule()); // ✅ 注册摸鱼挂机模块
+        registerModule(new LajiModule()); // ✅ 注册垃圾喵模块
     }
 
     private void registerModule(IRabiModule module) {
