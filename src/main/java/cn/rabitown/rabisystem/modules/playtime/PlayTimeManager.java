@@ -114,7 +114,7 @@ public class PlayTimeManager {
 
     private void updateAllOnlineCache() {
         long now = System.currentTimeMillis();
-        for(Player p : Bukkit.getOnlinePlayers()) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
             savePlayerSession(p.getUniqueId());
             sessionStart.put(p.getUniqueId(), now);
             checkSprout(p);
@@ -202,4 +202,14 @@ public class PlayTimeManager {
         if (hours > 0) return hours + "小时 " + minutes + "分钟";
         return minutes + "分钟";
     }
+
+    public Map<UUID, Long> getTotalPlaytimeCache() {
+        return totalPlaytime;
+    }
+
+    public void shutdown2() {
+        if (checkTask != null) checkTask.cancel();
+    }
+
+
 }

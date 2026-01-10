@@ -28,3 +28,7 @@ commands:
     afkrank:
       description: 查看摸鱼排行榜
       usage: /afkrank
+  guild:
+    description: 公会系统
+    usage: /guild
+    aliases: [ g, gonghui ]

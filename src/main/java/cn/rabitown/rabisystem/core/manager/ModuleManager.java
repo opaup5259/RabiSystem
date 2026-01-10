@@ -6,6 +6,7 @@ import cn.rabitown.rabisystem.api.IRabiModule;
 import cn.rabitown.rabisystem.modules.afk.AFKModule;
 import cn.rabitown.rabisystem.modules.corpse.CorpseModule;
 import cn.rabitown.rabisystem.modules.fakeplayer.FakePlayerModule;
+import cn.rabitown.rabisystem.modules.guild.GuildModule;
 import cn.rabitown.rabisystem.modules.laji.LajiModule;
 import cn.rabitown.rabisystem.modules.playtime.PlayTimeModule;
 import cn.rabitown.rabisystem.modules.prefix.PrefixModule;
@@ -34,6 +35,7 @@ public class ModuleManager {
         registerModule(new AFKModule()); // ✅ 注册摸鱼挂机模块
         registerModule(new LajiModule()); // ✅ 注册垃圾喵模块// [新增] 注册假人模块
         registerModule(new FakePlayerModule()); // ✅ 注册假人模块
+        registerModule(new GuildModule()); // ✅ [编程猫猫] 注册公会模块
     }
 
     private void registerModule(IRabiModule module) {
